@@ -1,0 +1,15 @@
+- name: install samba codeclient
+  apt: pkg={{item}} state=installed
+  with_items:
+   - cifs-utils 
+   - samba-common
+   - samba 
+
+- name: add connection script
+  template: src=connect.sh dest=/home/vagrant/connect.sh
+
+- name: make connection script executable
+  command: chmod +x /home/vagrant/connect.sh
+
+- name: invoke connection script
+  command: /home/vagrant/connect.sh
