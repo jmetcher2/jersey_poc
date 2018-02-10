@@ -1,0 +1,14 @@
+# including the external vars file in each play
+# really these could go into group and role vars
+# however, with that approach you end up with variable definitions scattered
+# all over the place, as there is no include mechanism with var files.
+- hosts: all
+  vars_files:
+    - ./external_vars.yml
+
+- hosts: readify-jersey
+  vars_files:
+    - ./external_vars.yml
+  roles:
+  - codeclient
+  - jersey

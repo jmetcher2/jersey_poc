@@ -3,13 +3,13 @@ module LocalVars
 	# ssh forwarded ports keyed on the machine_name variable defined in each Vagrantfile
 	# This is the Virtualbox host machine port.  Port on the guest will be 22 unless you edit the specific Vagrantfile
 	SSH_PORTS = { 
-		'readify_jersey' => 2222
+		'readify-jersey' => 2222
 	}
 
 	# http forwarded ports keyed on the machine_name variable defined in each Vagrantfile
 	# This is the Virtualbox host port.  Port on the guest will be 80 unless you edit the specific Vagrantfile
 	HTTP_PORTS = { 
-		'readify_jersey' => 8080
+		'readify-jersey' => 8080
 	}
 
 	# DigitalOcean stuff as needed by the Vagrant DigitalOcean plugin.  See https://github.com/smdahlen/vagrant-digitalocean

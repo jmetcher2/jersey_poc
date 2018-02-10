@@ -1,0 +1,6 @@
+# Settings for connecting to the code host
+# needed only for the codeclient role
+codehostuser: owner
+codehostpwd: ownerpwd
+codeclientsharename: code
+codehostname: cfdev

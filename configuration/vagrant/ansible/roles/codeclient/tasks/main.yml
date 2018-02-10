@@ -1,5 +1,6 @@
 - name: install samba codeclient
   apt: pkg={{item}} state=installed
+  become: true
   with_items:
    - cifs-utils 
    - samba-common
@@ -13,3 +14,4 @@
 
 - name: invoke connection script
   command: /home/vagrant/connect.sh
+  become: true

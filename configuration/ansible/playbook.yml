@@ -1,4 +1,0 @@
-- hosts: readify-jersey
-  roles:
-  - codeclient
-  - jersey

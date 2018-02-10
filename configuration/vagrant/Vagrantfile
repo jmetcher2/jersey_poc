@@ -3,6 +3,38 @@ include LocalVars
 
 Vagrant.configure("2") do |config|
 
+
+  # Common settings
   config.vm.box = "ubuntu/xenial64"
 
+  config.vm.provision "ansible_local" do |ansible|
+    ansible.playbook = "ansible/playbook.yml"
+  	ansible.groups = {
+  	  "jersey" => ["readify-jersey"],
+  	  "codeclient" => ["readify-jersey"],
+  	}
+	end
+
+  # On windows hosts the vagrant shared folder comes up as having 777 i.e. wide open
+  # and because the private key is there, ssh does NOT approve
+  # See https://stackoverflow.com/questions/29021246/ssh-fails-due-to-key-file-permissions-when-i-try-to-provision-a-vagrant-vm-with?rq=1
+  config.vm.synced_folder "./", "/vagrant", 
+     owner: "vagrant",
+     mount_options: ["dmode=775,fmode=600"]
+
+  # Per machine settings
+  config.vm.define "readify-jersey" do |jersey|
+
+    machine_name = "readify-jersey"
+
+    jersey.vm.hostname = machine_name
+    jersey.vm.network "forwarded_port", guest: 80, host: HTTP_PORTS[machine_name]
+
+    jersey.vm.provider "virtualbox" do |vb|
+      vb.memory = 1024
+    end
+
+  end
+
 end
+
