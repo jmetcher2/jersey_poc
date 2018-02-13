@@ -25,4 +25,8 @@ module LocalVars
 	# You can use smb on Windows hosts if you have Powershell 3.0, .Net 4.0, and run Vagrant from an elevated command prompt
 	FILE_SYNC_TYPE = 'vboxfs'
 
+  # Provisions a vagrant box with ansible to use as the ansible control
+  # Set this to true if you don't already have an ansible control box
+	PROVISION_ANSIBLE_CONTROL = false
+
 end

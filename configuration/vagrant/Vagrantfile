@@ -1,19 +1,11 @@
-require './localvars.rb'
-include LocalVars
+require 'yaml'
+settings = YAML.load_file 'localvars.yml'
 
 Vagrant.configure("2") do |config|
 
 
   # Common settings
   config.vm.box = "ubuntu/xenial64"
-
-  config.vm.provision "ansible_local" do |ansible|
-    ansible.playbook = "ansible/playbook.yml"
-  	ansible.groups = {
-  	  "jersey" => ["readify-jersey"],
-  	  "codeclient" => ["readify-jersey"],
-  	}
-	end
 
   # On windows hosts the vagrant shared folder comes up as having 777 i.e. wide open
   # and because the private key is there, ssh does NOT approve
@@ -28,13 +20,35 @@ Vagrant.configure("2") do |config|
     machine_name = "readify-jersey"
 
     jersey.vm.hostname = machine_name
-    jersey.vm.network "forwarded_port", guest: 80, host: HTTP_PORTS[machine_name]
+    jersey.vm.network "forwarded_port", guest: 80, host: settings.HTTP_PORTS[machine_name]
+    jersey.vm.network "forwarded_port", guest: 22, host: settings.SSH_PORTS[machine_name], id: "ssh"
 
     jersey.vm.provider "virtualbox" do |vb|
       vb.memory = 1024
     end
+  end
+
+  # provision an ansible control machine if the host is windows
+  if settings.PROVISION_ANSIBLE_CONTROL then
+
+    # Per machine settings
+    config.vm.define "ansible" do |ansible|
+
+      machine_name = "ansible"
+
+      ansible.vm.hostname = machine_name
+      ansible.vm.network "forwarded_port", guest: 22, host: settings.SSH_PORTS[machine_name], id: "ssh"
+      ansible.vm.synced_folder "../ansible", "/ansible"
+
+      ansible.vm.provider "virtualbox" do |vb|
+        vb.memory = 512
+      end
+
+      ansible.vm.provision :shell, path: "ansible.sh"
+    end
 
   end
+
 
 end
 

@@ -3,7 +3,8 @@ module LocalVars
 	# ssh forwarded ports keyed on the machine_name variable defined in each Vagrantfile
 	# This is the Virtualbox host machine port.  Port on the guest will be 22 unless you edit the specific Vagrantfile
 	SSH_PORTS = { 
-		'readify-jersey' => 2222
+		'readify-jersey' => 2222,
+		'ansible' => 2223
 	}
 
 	# http forwarded ports keyed on the machine_name variable defined in each Vagrantfile
@@ -23,5 +24,7 @@ module LocalVars
 	# You can use rsync on Windows hosts if you install CygWin first.
 	# You can use smb on Windows hosts if you have Powershell 3.0, .Net 4.0, and run Vagrant from an elevated command prompt
 	FILE_SYNC_TYPE = 'vboxfs'
+
+	PROVISION_ANSIBLE_CONTROL = true
 
 end
