@@ -1,14 +1,14 @@
 # ssh forwarded ports keyed on the machine_name variable defined in each Vagrantfile
 # This is the Virtualbox host machine port.  Port on the guest will be 22 unless you edit the specific Vagrantfile
 SSH_PORTS: 
-  readify-jersey:  2222
-  ansible:  2223
+  host1:  2222
+  host2:  2223
 
 
 # http forwarded ports keyed on the machine_name variable defined in each Vagrantfile
 # This is the Virtualbox host port.  Port on the guest will be 80 unless you edit the specific Vagrantfile
 HTTP_PORTS:
-  readify-jersey: 8080
+  host1: 8080
 
 # DigitalOcean stuff as needed by the Vagrant DigitalOcean plugin.  See https://github.com/smdahlen/vagrant-digitalocean
 DIG_OC:
@@ -21,6 +21,9 @@ DIG_OC:
 # You can use smb on Windows hosts if you have Powershell 3.0, .Net 4.0, and run Vagrant from an elevated command prompt
 FILE_SYNC_TYPE: 'vboxfs'
 
+# If true vagrant will provision a guest configured for use as an ansible control machine
+# Intended for windows hosts that can't run ansible, and where you don't already have
+# an ansible control vm
 PROVISION_ANSIBLE_CONTROL: true
 
 

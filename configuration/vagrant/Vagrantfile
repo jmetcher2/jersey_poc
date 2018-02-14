@@ -6,7 +6,8 @@ Vagrant.configure("2") do |config|
 
   # Common settings
   config.vm.box = "ubuntu/xenial64"
-
+  config.ssh.insert_key = settings['REPLACE_INSECURE_KEY']
+  
   # On windows hosts the vagrant shared folder comes up as having 777 i.e. wide open
   # and because the private key is there, ssh does NOT approve
   # See https://stackoverflow.com/questions/29021246/ssh-fails-due-to-key-file-permissions-when-i-try-to-provision-a-vagrant-vm-with?rq=1
@@ -14,14 +15,31 @@ Vagrant.configure("2") do |config|
      owner: "vagrant",
      mount_options: ["dmode=775,fmode=600"]
 
+  # Write an ansible inventory file based on what we know about our ssh ports
+  # vbhost will be added to the ansible control machine hosts file by the ansible.sh provisioning script,
+  # and will point to the virtualbox host machine. From there we port forward to ssh on each virtualbox guest
+  inventory = ''
+  settings['SSH_PORTS'].each do | key, value |
+    if settings['REPLACE_INSECURE_KEY'] then
+      sshkeypath = "/vagrant/.vagrant/machines/#{key}/virtualbox/private_key"
+    else
+      sshkeypath = "/vagrant/insecure_private_key"
+    end
+
+    inventory += "#{key} ansible_host=vbhost ansible_port=#{value} ansible_user='vagrant' ansible_ssh_private_key_file='#{sshkeypath}'\n"
+  end
+  File.open('ansible_hosts','w') do |h| 
+   h.write inventory
+  end
+
   # Per machine settings
   config.vm.define "readify-jersey" do |jersey|
 
     machine_name = "readify-jersey"
 
     jersey.vm.hostname = machine_name
-    jersey.vm.network "forwarded_port", guest: 80, host: settings.HTTP_PORTS[machine_name]
-    jersey.vm.network "forwarded_port", guest: 22, host: settings.SSH_PORTS[machine_name], id: "ssh"
+    jersey.vm.network "forwarded_port", guest: 80, host: settings['HTTP_PORTS'][machine_name]
+    jersey.vm.network "forwarded_port", guest: 22, host: settings['SSH_PORTS'][machine_name], id: "ssh"
 
     jersey.vm.provider "virtualbox" do |vb|
       vb.memory = 1024
@@ -29,7 +47,7 @@ Vagrant.configure("2") do |config|
   end
 
   # provision an ansible control machine if the host is windows
-  if settings.PROVISION_ANSIBLE_CONTROL then
+  if settings['PROVISION_ANSIBLE_CONTROL'] then
 
     # Per machine settings
     config.vm.define "ansible" do |ansible|
@@ -37,7 +55,7 @@ Vagrant.configure("2") do |config|
       machine_name = "ansible"
 
       ansible.vm.hostname = machine_name
-      ansible.vm.network "forwarded_port", guest: 22, host: settings.SSH_PORTS[machine_name], id: "ssh"
+      ansible.vm.network "forwarded_port", guest: 22, host: settings['SSH_PORTS'][machine_name], id: "ssh"
       ansible.vm.synced_folder "../ansible", "/ansible"
 
       ansible.vm.provider "virtualbox" do |vb|
