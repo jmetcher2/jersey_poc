@@ -3,10 +3,33 @@ settings = YAML.load_file 'localvars.yml'
 
 Vagrant.configure("2") do |config|
 
+  # Write an ansible inventory file based on what we know about our ssh ports
+  # We could also do this dynamically by parsing the output from vagrant ssh-config
+  inventory = ''
+  settings['SSH_PORTS'].each do | key, value |
+    # These paths are relative to the VM file system, i.e. they are pointing to 
+    # the automatically created /vagrant synced directory.  On the host that should 
+    # be where this Vagrantfile is
+    if settings['REPLACE_INSECURE_KEY'] then
+      sshkeypath = "/vagrant/.vagrant/machines/#{key}/virtualbox/private_key"
+    else
+      sshkeypath = "/vagrant/insecure_private_key"
+    end
 
-  # Common settings
+    # If you're using preexisting ansible control machine, add vbhost to your /etc/hosts file manually.
+    # Otherwise vbhost will be added to the ansible control machine hosts file by the ansible.sh provisioning script,
+    # vbhost should point to the virtualbox host machine. From there we port forward to ssh on each virtualbox guest
+    inventory += "#{key} ansible_host=vbhost ansible_port=#{value} ansible_user='vagrant' ansible_ssh_private_key_file='#{sshkeypath}'\n"
+  end
+  File.open('ansible_hosts','w') do |h| 
+   h.write inventory
+  end
+
+
+  # Settings common to all VMs
   config.vm.box = "ubuntu/xenial64"
   config.ssh.insert_key = settings['REPLACE_INSECURE_KEY']
+  config.vm.provision :shell, path: "python-ubuntu.sh"
   
   # On windows hosts the vagrant shared folder comes up as having 777 i.e. wide open
   # and because the private key is there, ssh does NOT approve
@@ -15,24 +38,7 @@ Vagrant.configure("2") do |config|
      owner: "vagrant",
      mount_options: ["dmode=775,fmode=600"]
 
-  # Write an ansible inventory file based on what we know about our ssh ports
-  # vbhost will be added to the ansible control machine hosts file by the ansible.sh provisioning script,
-  # and will point to the virtualbox host machine. From there we port forward to ssh on each virtualbox guest
-  inventory = ''
-  settings['SSH_PORTS'].each do | key, value |
-    if settings['REPLACE_INSECURE_KEY'] then
-      sshkeypath = "/vagrant/.vagrant/machines/#{key}/virtualbox/private_key"
-    else
-      sshkeypath = "/vagrant/insecure_private_key"
-    end
-
-    inventory += "#{key} ansible_host=vbhost ansible_port=#{value} ansible_user='vagrant' ansible_ssh_private_key_file='#{sshkeypath}'\n"
-  end
-  File.open('ansible_hosts','w') do |h| 
-   h.write inventory
-  end
-
-  # Per machine settings
+  # Per machine settings - jersey
   config.vm.define "readify-jersey" do |jersey|
 
     machine_name = "readify-jersey"
@@ -44,12 +50,13 @@ Vagrant.configure("2") do |config|
     jersey.vm.provider "virtualbox" do |vb|
       vb.memory = 1024
     end
+
   end
 
-  # provision an ansible control machine if the host is windows
+  # provision an ansible control machine if desired (necessary if the host is windows)
   if settings['PROVISION_ANSIBLE_CONTROL'] then
 
-    # Per machine settings
+    # Per machine settings - ansible
     config.vm.define "ansible" do |ansible|
 
       machine_name = "ansible"
@@ -69,4 +76,3 @@ Vagrant.configure("2") do |config|
 
 
 end
-

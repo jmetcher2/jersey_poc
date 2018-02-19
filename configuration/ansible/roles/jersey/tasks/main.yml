@@ -1,0 +1,3 @@
+- name: install tomcat8
+  apt: pkg=tomcat8 state=installed
+  become: true

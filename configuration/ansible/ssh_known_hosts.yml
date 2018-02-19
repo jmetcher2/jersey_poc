@@ -1,0 +1,32 @@
+# See https://stackoverflow.com/a/39083724
+# Thanks to Stepan Vavra
+
+# This will scan all the hosts in the ansible inventory and save their ssh keys in
+# the known hosts file
+# Run this on the ansible control machine after making any changes to the inventory, e.g.
+# adding or removing hosts, or regenerating ssh keys
+
+- name: Store known hosts of 'all' the hosts in the inventory file
+  hosts: localhost
+  connection: local
+
+  vars:
+    ssh_known_hosts_command: "ssh-keyscan -T 10"
+    ssh_known_hosts_file: "{{ lookup('env','HOME') + '/.ssh/known_hosts' }}"
+    ssh_known_hosts: "{{ groups['all'] }}"
+
+  tasks:
+
+  - name: For each host, scan for its ssh public key
+    shell: "ssh-keyscan -p {{ hostvars[item]['ansible_port'] }} {{ hostvars[item]['ansible_host'] }},`dig +short {{ hostvars[item]['ansible_host'] }}`"
+    with_items: "{{ ssh_known_hosts }}"
+    register: ssh_known_host_results
+    ignore_errors: yes
+
+  - name: Add/update the public key in the '{{ ssh_known_hosts_file }}'
+    known_hosts:
+      name: "[{{ hostvars[item.item]['ansible_host'] }}]:{{ hostvars[item.item]['ansible_port'] }}"
+      key: "{{ item.stdout }}"
+      path: "{{ ssh_known_hosts_file }}"
+    with_items: "{{ ssh_known_host_results.results }}"
+
