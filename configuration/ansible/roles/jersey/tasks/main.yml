@@ -1,3 +1,10 @@
 - name: install tomcat8
   apt: pkg=tomcat8 state=installed
   become: true
+
+- name: add restart to code connect script if it exists
+  lineinfile:
+    path: /home/vagrant/connect.sh
+    create: no
+    line: 'sudo service tomcat8 restart'
+    ignore_errors: yes

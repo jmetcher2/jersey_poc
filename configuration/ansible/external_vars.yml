@@ -2,5 +2,5 @@
 # needed only for the codeclient role
 codehostuser: owner
 codehostpwd: ownerpwd
-codeclientsharename: code
-codehostname: cfdev
+codeclientsharename: jersey_poc
+codehostname: 192.168.154.129

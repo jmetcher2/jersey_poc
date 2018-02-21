@@ -8,4 +8,4 @@ if [ ! -e /code ]; then
 	ln -s /mnt/code code
 fi
 
-mount -t cifs //{{codehostname}}/{{codeclientsharename}} /code -o username={{codehostuser}},password={{codehostpwd}},noexec
+mount -t cifs //{{codehostname}}/{{codeclientsharename}} /code -o username={{codehostuser}},password={{codehostpwd}},noexec,vers=3.0

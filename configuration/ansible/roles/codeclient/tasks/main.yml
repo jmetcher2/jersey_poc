@@ -10,7 +10,9 @@
   template: src=connect.sh dest=/home/vagrant/connect.sh
 
 - name: make connection script executable
-  command: chmod +x /home/vagrant/connect.sh
+  file: 
+    path: /home/vagrant/connect.sh
+    mode: +x
 
 - name: invoke connection script
   command: /home/vagrant/connect.sh

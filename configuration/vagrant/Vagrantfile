@@ -44,7 +44,7 @@ Vagrant.configure("2") do |config|
     machine_name = "readify-jersey"
 
     jersey.vm.hostname = machine_name
-    jersey.vm.network "forwarded_port", guest: 80, host: settings['HTTP_PORTS'][machine_name]
+    jersey.vm.network "forwarded_port", guest: 8080, host: settings['HTTP_PORTS'][machine_name]
     jersey.vm.network "forwarded_port", guest: 22, host: settings['SSH_PORTS'][machine_name], id: "ssh"
 
     jersey.vm.provider "virtualbox" do |vb|
