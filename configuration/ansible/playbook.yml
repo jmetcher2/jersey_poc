@@ -6,7 +6,7 @@
   vars_files:
     - ./external_vars.yml
 
-- hosts: readify-jersey
+- hosts: jersey
   vars_files:
     - ./external_vars.yml
   roles:

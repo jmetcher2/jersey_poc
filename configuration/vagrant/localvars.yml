@@ -1,14 +1,18 @@
 # ssh forwarded ports keyed on the machine_name variable defined in each Vagrantfile
 # This is the Virtualbox host machine port.  Port on the guest will be 22 unless you edit the specific Vagrantfile
 SSH_PORTS: 
-  readify-jersey:  2222
+  jersey:  2222
   ansible:  2223
 
 
 # http forwarded ports keyed on the machine_name variable defined in each Vagrantfile
 # This is the Virtualbox host port.  Port on the guest will be 80 unless you edit the specific Vagrantfile
 HTTP_PORTS:
-  readify-jersey: 8080
+  jersey: 8080
+
+IPS:
+  jersey: 192.168.56.11
+  ansible: 192.168.56.12
 
 # DigitalOcean stuff as needed by the Vagrant DigitalOcean plugin.  See https://github.com/smdahlen/vagrant-digitalocean
 DIG_OC:
@@ -28,3 +32,11 @@ PROVISION_ANSIBLE_CONTROL: true
 # This is for ease of use in development esp on Windows environments 
 # For any deployment outside of a secure local dev environment, leave this at the default of "true"
 REPLACE_INSECURE_KEY: true
+
+# Extra hosts to add to the ansible inventory
+EXTRA_INVENTORY:
+  codehost: "ansible_host=vbhost ansible_port=2224 ansible_user='owner' ansible_ssh_private_key_file='/vagrant/ansible_codehost'"
+
+ANSIBLE_GROUPS:
+  jersey: []
+  ansible_control: []
