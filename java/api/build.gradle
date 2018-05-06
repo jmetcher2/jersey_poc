@@ -12,6 +12,11 @@ plugins {
     id 'eclipse-wtp'
 }
 
+gretty {
+  integrationTestTask = 'test'
+ }
+ 
+
 // In this section you declare where to find the dependencies of your project
 repositories {
     // Use jcenter for resolving your dependencies.
@@ -24,8 +29,11 @@ def jersey_version = '2.27'
 dependencies {
 
    compile "org.glassfish.jersey.containers:jersey-container-servlet:${jersey_version}"
-   
+   compile "org.glassfish.jersey.inject:jersey-hk2:${jersey_version}"
+   compile "org.glassfish.jersey.media:jersey-media-json-jackson:${jersey_version}"
+      
    testCompile 'junit:junit:4.+';
+   testCompile "org.glassfish.jersey.core:jersey-client:${jersey_version}"
    
    // compile ('org.glassfish.jersey.ext:jersey-spring4:${jersey_version}') {
    //  exclude module: 'bean-validator'
