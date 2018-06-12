@@ -1,3 +1,14 @@
+# Grab the global config that our Vagrant file stashed in the inventory
+- hosts: all
+  tasks: 
+    # - name: print stuff
+    #   debug: 
+    #     msg: "{{ vagrant_vars }}"
+    - name: parse vagrant vars
+      set_fact: 
+        vagrant_fact: "{{ vagrant_vars | from_json }}"
+
+
 # including the external vars file in each play
 # really these could go into group and role vars
 # however, with that approach you end up with variable definitions scattered

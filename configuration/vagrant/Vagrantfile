@@ -1,3 +1,4 @@
+require 'json'
 require 'yaml'
 settings = YAML.load_file 'localvars.yml'
 
@@ -37,9 +38,7 @@ Vagrant.configure("2") do |config|
 
     machine_name = "jersey"
 
-    jersey.vm.hostname = machine_name
     jersey.vm.network "forwarded_port", guest: 8080, host: settings['HTTP_PORTS'][machine_name]
-    jersey.vm.network "forwarded_port", guest: 22, host: settings['SSH_PORTS'][machine_name], id: "ssh"
 
     jersey.vm.provider "virtualbox" do |vb|
       vb.memory = 1024
@@ -55,8 +54,6 @@ Vagrant.configure("2") do |config|
 
       machine_name = "ansible"
 
-      ansible.vm.hostname = machine_name
-      ansible.vm.network "forwarded_port", guest: 22, host: settings['SSH_PORTS'][machine_name], id: "ssh"
       ansible.vm.synced_folder "../ansible", "/ansible"
 
       ansible.vm.provider "virtualbox" do |vb|
@@ -91,6 +88,7 @@ Vagrant.configure("2") do |config|
   settings['EXTRA_INVENTORY'].each do | key, value |
     inventory += "#{key} #{value}\n"
   end 
+  inventory += "\n"
 
   settings['ANSIBLE_GROUPS'].each do | key, value |
     inventory += "[#{key}]\n"
@@ -99,6 +97,8 @@ Vagrant.configure("2") do |config|
     end
     inventory += "\n"
   end 
+
+  inventory += "[all:vars]\nvagrant_vars=#{settings.to_json}"
 
   File.open('ansible_hosts','w') do |h| 
    h.write inventory

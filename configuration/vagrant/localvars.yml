@@ -13,6 +13,7 @@ HTTP_PORTS:
 IPS:
   jersey: 192.168.56.11
   ansible: 192.168.56.12
+  codehost: 192.168.154.129
 
 # DigitalOcean stuff as needed by the Vagrant DigitalOcean plugin.  See https://github.com/smdahlen/vagrant-digitalocean
 DIG_OC:
